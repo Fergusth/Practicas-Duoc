@@ -110,16 +110,118 @@ class Usuarios(models.Model):
 class Alumno(Usuarios):
     "Modelo alumno"
 
-    nota = models.IntegerField(
-        verbose_name="nota"
-    )
-
     class Meta:
         verbose_name = "Alumno"
         verbose_name_plural = "Alumnos"
 
     def __str__(self):
         return (self.nombre)
+
+class Supervisor_practica(Usuarios):
+    "modelo supervisor practica"
+
+    cargo = models.CharField(
+        max_length = 50,
+        verbose_name = 'cargo'
+    )
+
+    class Meta:
+        verbose_name = "Supervisor"
+        verbose_name_plural = "Supervisores"
+
+    def __str__(self):
+        return (self.nombre)
+
+class Centro_practica(models.Model):
+    "modelo centro de práctica"
+
+    direccion = models.CharField(
+        max_length = 50,
+        verbose_name = 'direccion'
+    )
+    
+    supervisor = models.ForeignKey(
+        Supervisor_practica,
+        on_delete = models.CASCADE,
+        verbose_name = "supervisor"
+    )
+
+    telefono = models.IntegerField(
+        verbose_name="telefono"
+    )
+
+    horas_diarias = models.IntegerField(
+        verbose_name="horas diarias de trabajo",
+        default=8
+    )
+
+    class Meta:
+        verbose_name = 'centro de practica'
+        verbose_name_plural = 'centros de practica'
+    
+    def __str__(self):
+        return (self.direccion)
+
+
+class Practica_alumno(models.Model):
+    "Modelo de practica asignada al alumno"
+
+    ACEPTADA = "Aceptada"
+    ANULADA = "Anulada"
+    ASIGNADA = "Asignada"
+    REPROBADA = "Reprobada"
+    APROBADA = "Aprobada"
+    ENVIADA = "Enviada"
+
+    ESTADOS = (
+        (ACEPTADA, "Aceptada"),
+        (ANULADA, "Anulada"),
+        (ASIGNADA, "Asignada"),
+        (REPROBADA, "Reprobada"),
+        (APROBADA, "Aprobada"),
+        (ENVIADA, "Enviada")
+    )
+
+    alumno = models.ForeignKey(
+        Alumno,
+        on_delete=models.CASCADE,
+        verbose_name = "alumno"
+    )
+
+    practica = models.ForeignKey(
+        Practica,
+        on_delete=models.CASCADE,
+        verbose_name = 'Práctica'
+    )
+
+    fecha_inicio = models.DateField(
+        verbose_name="fecha inicio"
+    )
+
+    fecha_termino = models.DateField(
+        verbose_name="fecha termino"
+    )
+
+    centro_practica = models.ForeignKey(
+        Centro_practica,
+        on_delete = models.CASCADE,
+        verbose_name="centro de practica"
+    )
+
+    estado_practica = models.CharField(
+        verbose_name="estado",
+        choices=ESTADOS,
+        default=ENVIADA,
+        max_length = 50
+    )
+    
+    class Meta:
+        verbose_name = 'Practica_alumno'
+        verbose_name_plural = "Practicas_alumno"
+    
+    def __str__(self):
+        return (self.alumno.nombre)
+
 
 class Escuela(models.Model):
     "Model escuela"

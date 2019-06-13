@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'GestionDePracticas.wsgi.application'
 DATABASES = {
         'default': {
             'ENGINE': 'mysql.connector.django',
-            'NAME': 'db_practicas',
+            'NAME': 'db_practicas_duoc',
             'USER': 'root',
             'PASSWORD': 'registropracticas2019A',
             'HOST': 'localhost',
@@ -94,6 +94,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+
 
 
 # Internationalization

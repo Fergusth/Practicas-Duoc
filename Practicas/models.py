@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import datetime
 # Create your models here.
 
 class Rol(models.Model):
@@ -17,6 +17,22 @@ class Rol(models.Model):
     def __str__(self):
         return (self.descripcion)
 
+class Escuela(models.Model):
+    "Model escuela"
+
+    nombre = models.CharField(
+        verbose_name = "nombre",
+        max_length = 50
+    )
+
+    class Meta:
+        verbose_name = "Escuela"
+        verbose_name_plural = "Escuelas"
+
+    def __str__(self):
+        return (self.nombre)
+
+
 class Carrera(models.Model):
     "Modelo de carrera"
 
@@ -29,6 +45,12 @@ class Carrera(models.Model):
         verbose_name="duracion en semestres"
     )
 
+    escuela = models.ForeignKey(
+        Escuela,
+        on_delete = models.CASCADE,
+        verbose_name = "Escuela"
+    )
+    
     class Meta:
         verbose_name = "Carrera"
         verbose_name_plural = "Carreras"
@@ -36,7 +58,81 @@ class Carrera(models.Model):
     def __str__(self):
         return (self.nombre)
 
-class Practica(models.Model):
+
+class Usuarios(models.Model):
+    "Modelo de nota"
+
+    rut = models.CharField(
+        verbose_name="rut",
+        max_length=20,
+    )
+
+    nombre = models.CharField(
+        verbose_name="nombre",
+        max_length=50,
+    )
+
+    rol = models.ForeignKey(
+        Rol,
+        on_delete=models.CASCADE,
+        verbose_name = "rol",
+    )
+
+    email = models.CharField(
+        verbose_name="correo electrónico",
+        max_length=100,
+    )
+
+    contraseña = models.CharField(
+        verbose_name="contraseña",
+        default=".",
+        max_length=20,
+    )
+
+    class Meta:
+        verbose_name = "Usuario"
+        verbose_name_plural = "Usuarios"
+
+    def __str__(self):
+        return (self.nombre)
+
+class Profesor(Usuarios):
+    "Modelo profesor"
+
+    class Meta:
+        verbose_name = "Profesor"
+        verbose_name_plural = "profesores"
+
+    def __str__(self):
+        return (self.nombre)
+
+class Asignatura_inscrita(models.Model):
+    "Modelo asignatura"
+
+    descripcion = models.CharField(
+        verbose_name = 'descripcion',
+        max_length = 50
+    )
+
+    seccion = models.CharField(
+        verbose_name = 'sección',
+        max_length = 50
+    )
+
+    profesor = models.ForeignKey(
+        Profesor,
+        on_delete=models.CASCADE,
+        verbose_name = 'Profesor'
+    )
+
+    class Meta:
+        verbose_name = 'asignatura inscrita'
+        verbose_name = 'asignaturas inscritas'
+    
+    def __str__(self):
+        return (self.nombre + " - " + self.seccion)
+
+class Practica(Asignatura_inscrita):
     "Modelo de práctica"
     
     PROFESIONAL = "Profesional"
@@ -71,48 +167,34 @@ class Practica(models.Model):
     def __str__(self):
         return (self.tipoPractica + " - " + self.carrera.nombre)
 
-class Usuarios(models.Model):
-    "Modelo de nota"
-
-    rut = models.CharField(
-        verbose_name="rut",
-        max_length=20,
-    )
-
-    nombre = models.CharField(
-        verbose_name="nombre",
-        max_length=50,
-    )
-
-    rol = models.ForeignKey(
-        Rol,
-        on_delete=models.CASCADE,
-        verbose_name = "rol",
-    )
-
-    email = models.CharField(
-        verbose_name="correo electrónico",
-        max_length=100,
-    )
-
-    contraseña = models.CharField(
-        verbose_name="contraseña",
-        max_length=20,
-    )
-
-    class Meta:
-        verbose_name = "Usuario"
-        verbose_name_plural = "Usuarios"
-
-    def __str__(self):
-        return (self.nombre)
-
 class Alumno(Usuarios):
     "Modelo alumno"
 
     class Meta:
         verbose_name = "Alumno"
         verbose_name_plural = "Alumnos"
+
+    def __str__(self):
+        return (self.nombre)
+
+class asignatura_alumno(models.Model):
+    """modelo asignatura del alumno"""
+
+    alumno = models.ForeignKey(
+        Alumno,
+        on_delete=models.CASCADE,
+        verbose_name = 'alumno'
+    )
+
+    asignatura_inscrita = models.ForeignKey(
+        Asignatura_inscrita,
+        on_delete=models.CASCADE,
+        verbose_name = "profesor"
+    )
+
+    class Meta:
+        verbose_name = "Asignatura alumno"
+        verbose_name_plural = "Asignaturas alumnos"
 
     def __str__(self):
         return (self.nombre)
@@ -223,44 +305,7 @@ class Practica_alumno(models.Model):
         return (self.alumno.nombre)
 
 
-class Escuela(models.Model):
-    "Model escuela"
-
-    nombre = models.CharField(
-        verbose_name = "nombre",
-        max_length = 50
-    )
-
-    class Meta:
-        verbose_name = "Escuela"
-        verbose_name_plural = "Escuelas"
-
-    def __str__(self):
-        return (self.nombre)
-
-class Carrera_escuela(models.Model):
-    "Modelo carrera escuela"
-
-    carrera = models.ForeignKey(
-        Carrera,
-        on_delete = models.CASCADE,
-        verbose_name = "Carrera"
-    )
-
-    escuela = models.ForeignKey(
-        Escuela,
-        on_delete = models.CASCADE,
-        verbose_name = "Escuela"
-    )
-
-    class Meta:
-        verbose_name = "Carrera_escuela"
-        verbose_name_plural = "Carreras_Escuelas"
-
-    def __str__(self):
-        return (self.carrera.nombre + " - " + self.escuela.nombre)
-
-class Sede (models.Model):
+class Sede(models.Model):
     "Modelo sede"
 
     nombre = models.CharField(
@@ -287,16 +332,16 @@ class Sede (models.Model):
 class Sede_Escuela(models.Model):
     "Modelo de sede escuela"
 
-    carrera = models.ForeignKey(
-        Carrera,
+    Escuela = models.ForeignKey(
+        Escuela,
         on_delete = models.CASCADE,
-        verbose_name = "Carrera"
+        verbose_name = "escuela"
     )
 
     sede = models.ForeignKey(
         Sede,
         on_delete = models.CASCADE,
-        verbose_name = "Escuela"
+        verbose_name = "sede"
     )
 
     class Meta:

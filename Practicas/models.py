@@ -130,7 +130,31 @@ class Asignatura_inscrita(models.Model):
         verbose_name = 'asignaturas inscritas'
     
     def __str__(self):
-        return (self.nombre + " - " + self.seccion)
+        return (self.descripcion + " - " + self.seccion)
+
+class Sede(models.Model):
+    "Modelo sede"
+
+    nombre = models.CharField(
+        verbose_name = "nombre",
+        max_length = 50,
+    )
+
+    ciudad = models.CharField(
+        verbose_name = "ciudad",
+        max_length = 50
+    )
+
+    telefono = models.IntegerField(
+        verbose_name= "teléfono"
+    )
+
+    class Meta:
+        verbose_name = "Sede"
+        verbose_name_plural = "Sedes"
+
+    def __str__(self):
+        return (self.nombre)
 
 class Practica(Asignatura_inscrita):
     "Modelo de práctica"
@@ -158,6 +182,12 @@ class Practica(Asignatura_inscrita):
         Carrera,
         on_delete=models.CASCADE,
         verbose_name = "Carrera",
+    )
+
+    sede = models.ForeignKey(
+        Sede,
+        on_delete=models.CASCADE,
+        verbose_name= "sede"
     )
 
     class Meta:
@@ -189,7 +219,37 @@ class asignatura_alumno(models.Model):
     asignatura_inscrita = models.ForeignKey(
         Asignatura_inscrita,
         on_delete=models.CASCADE,
-        verbose_name = "profesor"
+        verbose_name = "Asignatura"
+    )
+
+    nota1 = models.IntegerField(
+        verbose_name='Nota 1',
+        blank=True,
+        null=True
+    )
+
+    nota2 = models.IntegerField(
+        verbose_name='nota 2',
+        blank=True,
+        null=True
+    )
+
+    nota3 = models.IntegerField(
+        verbose_name='nota 3',
+        blank=True,
+        null=True
+    )
+
+    nota4 = models.IntegerField(
+        verbose_name='nota 4',
+        blank=True,
+        null=True
+    )
+
+    promedio = models.IntegerField(
+        verbose_name='Promedio',
+        blank=True,
+        null=True
     )
 
     class Meta:
@@ -197,7 +257,8 @@ class asignatura_alumno(models.Model):
         verbose_name_plural = "Asignaturas alumnos"
 
     def __str__(self):
-        return (self.nombre)
+        return (self.asignatura_inscrita.descripcion)
+
 
 class Supervisor_practica(Usuarios):
     "modelo supervisor practica"
@@ -216,6 +277,16 @@ class Supervisor_practica(Usuarios):
 
 class Centro_practica(models.Model):
     "modelo centro de práctica"
+
+    rut = models.CharField(
+        max_length=50,
+        verbose_name ="rut"
+    )
+
+    nombre_empresa = models.CharField(
+        max_length=50,
+        verbose_name="nombre empresa"
+    )
 
     direccion = models.CharField(
         max_length = 50,
@@ -248,20 +319,16 @@ class Centro_practica(models.Model):
 class Practica_alumno(models.Model):
     "Modelo de practica asignada al alumno"
 
-    ACEPTADA = "Aceptada"
+    EN_CURSO = "En curso"
     ANULADA = "Anulada"
-    ASIGNADA = "Asignada"
-    REPROBADA = "Reprobada"
-    APROBADA = "Aprobada"
-    ENVIADA = "Enviada"
-
+    CERRADA = "Cerrada"
+    INSCRITA = "Inscrita"
+    
     ESTADOS = (
-        (ACEPTADA, "Aceptada"),
+        (EN_CURSO, "En curso"),
         (ANULADA, "Anulada"),
-        (ASIGNADA, "Asignada"),
-        (REPROBADA, "Reprobada"),
-        (APROBADA, "Aprobada"),
-        (ENVIADA, "Enviada")
+        (CERRADA, "Cerrada"),
+        (INSCRITA, "Inscrita")
     )
 
     alumno = models.ForeignKey(
@@ -277,11 +344,15 @@ class Practica_alumno(models.Model):
     )
 
     fecha_inicio = models.DateField(
-        verbose_name="fecha inicio"
+        verbose_name="fecha inicio",
+        blank=True,
+        null=True
     )
 
     fecha_termino = models.DateField(
-        verbose_name="fecha termino"
+        verbose_name="fecha termino",
+        blank=True,
+        null=True
     )
 
     centro_practica = models.ForeignKey(
@@ -293,7 +364,7 @@ class Practica_alumno(models.Model):
     estado_practica = models.CharField(
         verbose_name="estado",
         choices=ESTADOS,
-        default=ENVIADA,
+        default=INSCRITA,
         max_length = 50
     )
     
@@ -303,31 +374,6 @@ class Practica_alumno(models.Model):
     
     def __str__(self):
         return (self.alumno.nombre)
-
-
-class Sede(models.Model):
-    "Modelo sede"
-
-    nombre = models.CharField(
-        verbose_name = "nombre",
-        max_length = 50,
-    )
-
-    ciudad = models.CharField(
-        verbose_name = "ciudad",
-        max_length = 50
-    )
-
-    telefono = models.IntegerField(
-        verbose_name= "teléfono"
-    )
-
-    class Meta:
-        verbose_name = "Sede"
-        verbose_name_plural = "Sedes"
-
-    def __str__(self):
-        return (self.nombre)
 
 class Sede_Escuela(models.Model):
     "Modelo de sede escuela"
@@ -349,5 +395,33 @@ class Sede_Escuela(models.Model):
         verbose_name_plural = "Sedes_Escuelas"
 
     def __str__(self):
-        return (self.carrera.nombre + " - " + self.sede.nombre)
+        return (self.Escuela.nombre + " - " + self.sede.nombre)
 
+
+class Formulario_practica(models.Model):
+    
+    alumno = models.ForeignKey(
+        Alumno,
+        on_delete = models.CASCADE,
+        verbose_name = "alumno"
+    )
+
+    centro_practica = models.ForeignKey(
+        Centro_practica,
+        on_delete = models.CASCADE,
+        verbose_name = "centro de practica"
+    )
+
+    fecha_inicio = models.DateField(
+        verbose_name="fecha inicio",
+        blank=True,
+        null=True
+    )
+
+
+    class Meta:
+        verbose_name = "Formulario_de_practica"
+        verbose_name_plural = "Formularios_de_practica"
+
+    def __str__(self):
+        return (self.alumno.nombre + " - " + self.centro_practica.direccion)

@@ -3,12 +3,19 @@ from .models import (
     Usuarios, 
     Practica_alumno,
     Sede,
-    Carrera
+    Carrera,
+    Sede_Escuela,
+    Formulario_practica
 )
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuarios
+        fields = '__all__'
+
+class FormularioPracticaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Formulario_practica
         fields = '__all__'
 
 class PracticaAlumnoSerializer(serializers.ModelSerializer):
@@ -26,4 +33,9 @@ class sedeSerializer(serializers.ModelSerializer):
 class carreraSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carrera
-        field = '__all__'
+        fields = '__all__'
+
+class sedeEscuelaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sede_Escuela
+        fields = '__all__'

@@ -5,7 +5,10 @@ from .models import (
     Sede,
     Carrera,
     Sede_Escuela,
-    Formulario_practica
+    Formulario_practica,
+    Centro_practica,
+    Supervisor_practica,
+    asignatura_alumno
 )
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -13,9 +16,25 @@ class UsuarioSerializer(serializers.ModelSerializer):
         model = Usuarios
         fields = '__all__'
 
+class AsignaturaAlumnoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = asignatura_alumno
+        fields = '__all__'
+
+class Centro_practicaSerialize(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Centro_practica
+        fields = '__all__'
+
 class FormularioPracticaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Formulario_practica
+        fields = '__all__'
+
+class supervisorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supervisor_practica
         fields = '__all__'
 
 class PracticaAlumnoSerializer(serializers.ModelSerializer):

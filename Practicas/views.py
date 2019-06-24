@@ -5,6 +5,7 @@ from .serializer import UsuarioSerializer, PracticaAlumnoSerializer
 from rest_framework.decorators import api_view, schema
 from datetime import datetime, timedelta
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import (
     Usuarios,
@@ -16,7 +17,9 @@ from .models import (
     Sede_Escuela,
     Escuela,
     Carrera,
-    Formulario_practica
+    Formulario_practica,
+    Supervisor_practica,
+    asignatura_alumno
 )
 from .serializer import (
     UsuarioSerializer, 
@@ -24,7 +27,9 @@ from .serializer import (
     sedeSerializer,
     sedeEscuelaSerializer,
     carreraSerializer,
-    FormularioPracticaSerializer
+    FormularioPracticaSerializer,Centro_practicaSerialize,
+    supervisorSerializer,
+    AsignaturaAlumnoSerializer
 )
 
 # Create your views here.
@@ -54,6 +59,57 @@ def iniciarSesion(request):
 class listaUsuarios(generics.ListAPIView):
     queryset = Usuarios.objects.all()
     serializer_class = UsuarioSerializer
+
+class listarCentros(generics.ListAPIView):
+    queryset = Centro_practica.objects.all()
+    serializer_class = Centro_practicaSerialize
+
+class ListarCentrosId(generics.ListAPIView):
+    serializer_class = Centro_practicaSerialize
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        id = self.kwargs.get('id')
+        return Centro_practica.objects.filter(id = id)
+
+# class ListarFormPracticas(APIView):
+#     serializer_class = FormularioPracticaSerializer
+#     lookup_field = 'rutAlumno'
+
+#     def get_queryset(self):
+#         rutAlumno = self.kwargs.get('rutAlumno')
+#         return Formulario_practica.objects.get(alumno__rut = rutAlumno)
+
+@api_view(['GET'])
+def ListarFormPracticas(request, rutAlumno):
+    """
+    Para usar api
+    {"correo": "estecorreonoexiste@gmail.com", "contrasenia": "contrasenianoexiste"}
+    """
+
+    try:
+        form = Formulario_practica.objects.get(alumno__rut = rutAlumno)
+        formRet = {
+            "id": form.id,
+            "alumno": form.alumno.rut,
+            "fecha_inicio": form.fecha_inicio,
+            "centro": form.centro_practica.rut
+        }
+        return Response(formRet)
+    except Usuarios.DoesNotExist:
+        return Response('No existe este usuario', status=status.HTTP_404_NOT_FOUND)
+        
+class listarSupervisores(generics.ListAPIView):
+    queryset = Supervisor_practica.objects.all()
+    serializer_class = supervisorSerializer
+
+class SupervisorId(generics.ListAPIView):
+    serializer_class = supervisorSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        id = self.kwargs.get('id')
+        return Supervisor_practica.objects.filter(id = id)
 
 class listaSedes(generics.ListAPIView):
     queryset = Sede.objects.all()
@@ -95,6 +151,28 @@ def editarHorasPractica(request):
 
     return Response('Practica editada')
 
+@api_view(['GET'])
+def editarFormPractica(request, rutAlumno, fechaInicio):
+    """ Para editar las horas de práctica de una sede y carrera, los tipos pueden ser 'Profesional' y 'Laboral'
+        {"rut_alumno": "19370864-1", "fecha_inicio": "2019-10-10"}
+    """
+    rut_alumno = rutAlumno
+    fecha_inicio = fechaInicio
+
+    practica = Formulario_practica.objects.get(alumno__rut=rut_alumno)
+    practica.fecha_inicio = fecha_inicio
+    practica.save()
+
+    return Response('f Practica editada')
+
+@api_view(['GET'])
+def addFormPractica(request, rutAlumno, fechaInicio, centro):
+
+    alumno = Alumno.objects.get(rut = rutAlumno)
+    centro = Centro_practica.objects.get(rut = centro)
+
+    Formulario_practica.objects.create(alumno = alumno, centro_practica= centro, fecha_inicio = fechaInicio)
+    return Response('f Practica agregada')
 class crearUsuario(generics.CreateAPIView):
     queryset = Usuarios.objects.all()
     serializer_class = UsuarioSerializer
@@ -182,3 +260,7 @@ def suma_dias_habiles(fecha_origen, dias):
 class Formulario_practicaView(viewsets.ModelViewSet):
     queryset = Formulario_practica.objects.all()
     serializer_class = FormularioPracticaSerializer
+
+class practicaView(viewsets.ModelViewSet):
+    queryset = asignatura_alumno.objects.all()
+    serializer_class = AsignaturaAlumnoSerializer

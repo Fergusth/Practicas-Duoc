@@ -12,7 +12,8 @@ from .models import (
     Supervisor_practica,
     Centro_practica,
     Profesor,
-    asignatura_alumno
+    asignatura_alumno,
+    Formulario_practica
     )
 
 admin.site.register(Usuarios)
@@ -28,3 +29,4 @@ admin.site.register(Supervisor_practica)
 admin.site.register(Centro_practica)
 admin.site.register(Profesor)
 admin.site.register(asignatura_alumno)
+admin.site.register(Formulario_practica)

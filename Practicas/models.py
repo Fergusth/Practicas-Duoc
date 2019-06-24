@@ -60,7 +60,7 @@ class Carrera(models.Model):
 
 
 class Usuarios(models.Model):
-    "Modelo de nota"
+    "Modelo de usuarios"
 
     rut = models.CharField(
         verbose_name="rut",

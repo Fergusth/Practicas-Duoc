@@ -33,7 +33,7 @@ django-rest-auth==0.9.3
 django-rest-passwordreset==1.0.0
 django-smart-selects==1.5.4
 django-storages==1.7.1
-djangorestframework==3.9.0
+djangorestframework==3.11.2
 feedparser==5.2.1
 Flask==0.12.2
 Flask-BabelEx==0.9.3

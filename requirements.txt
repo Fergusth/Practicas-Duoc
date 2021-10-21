@@ -2,7 +2,7 @@ alembic==0.9.3.dev0
 apturl==0.5.2
 asn1crypto==0.24.0
 astroid==2.2.5
-Babel==2.4.0
+Babel==2.9.1
 beautifulsoup4==4.6.0
 blinker==1.4
 Brlapi==0.6.6
